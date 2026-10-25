@@ -74,12 +74,7 @@ class LoginController extends State<Login> {
       } else {
         identifier = AuthenticationUserIdentifier(user: username);
       }
-      
       final client = await matrix.getLoginClient();
-      
-      // 【新增代码】强制写死你的服务器地址
-      client.homeserver = Uri.parse('https://im.tk00.vip');
-
       await client.login(
         LoginType.mLoginPassword,
         identifier: identifier,
