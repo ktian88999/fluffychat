@@ -146,29 +146,36 @@ class MatrixState extends State<Matrix> {
     if (widget.clients.isNotEmpty && !client.isLogged()) {
       return client;
     }
-    final candidate = _loginClientCandidate ??=
-        await ClientManager.createClient(
-            '${AppSettings.applicationName.value}-${DateTime.now().millisecondsSinceEpoch}',
-            store,
-          )
-          // 【修改点】：在这里强制指定你的服务器地址
-          ..homeserver = Uri.parse('https://im.tk00.vip')
-          ..onLoginStateChanged.stream
-              .where((l) => l == LoginState.loggedIn)
-              .first
-              .then((_) {
-                if (!widget.clients.contains(_loginClientCandidate)) {
-                  widget.clients.add(_loginClientCandidate!);
-                }
-                ClientManager.addClientNameToStore(
-                  _loginClientCandidate!.clientName,
-                  store,
-                );
-                _registerSubs(_loginClientCandidate!.clientName);
-                setActiveClient(_loginClientCandidate);
-                _loginClientCandidate = null;
-                FluffyChatApp.router.go('/backup');
-              });
+    
+    // 【核心修改点】：在这里强制指定你的服务器地址
+    if (_loginClientCandidate == null) {
+      _loginClientCandidate = await ClientManager.createClient(
+        '${AppSettings.applicationName.value}-${DateTime.now().millisecondsSinceEpoch}',
+        store,
+      );
+
+      // 强制写死服务器地址
+      _loginClientCandidate!.homeserver = Uri.parse('https://im.tk00.vip');
+
+      _loginClientCandidate!.onLoginStateChanged.stream
+          .where((l) => l == LoginState.loggedIn)
+          .first
+          .then((_) {
+            if (!widget.clients.contains(_loginClientCandidate)) {
+              widget.clients.add(_loginClientCandidate!);
+            }
+            ClientManager.addClientNameToStore(
+              _loginClientCandidate!.clientName,
+              store,
+            );
+            _registerSubs(_loginClientCandidate!.clientName);
+            setActiveClient(_loginClientCandidate);
+            _loginClientCandidate = null;
+            FluffyChatApp.router.go('/backup');
+          });
+    }
+
+    final candidate = _loginClientCandidate!;
     if (widget.clients.isEmpty) widget.clients.add(candidate);
     return candidate;
   }
@@ -445,10 +452,6 @@ class MatrixState extends State<Matrix> {
       return;
     }
     if (!context.mounted) return;
-    final result = await showFutureLoadingDialog(
-      context: context,
-      future: client.exportDump,
-    );
     final result = await showFutureLoadingDialog(
       context: context,
       future: client.exportDump,
