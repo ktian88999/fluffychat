@@ -151,6 +151,8 @@ class MatrixState extends State<Matrix> {
             '${AppSettings.applicationName.value}-${DateTime.now().millisecondsSinceEpoch}',
             store,
           )
+          // 【修改点】：在这里强制指定你的服务器地址
+          ..homeserver = Uri.parse('https://im.tk00.vip')
           ..onLoginStateChanged.stream
               .where((l) => l == LoginState.loggedIn)
               .first
@@ -443,6 +445,10 @@ class MatrixState extends State<Matrix> {
       return;
     }
     if (!context.mounted) return;
+    final result = await showFutureLoadingDialog(
+      context: context,
+      future: client.exportDump,
+    );
     final result = await showFutureLoadingDialog(
       context: context,
       future: client.exportDump,
