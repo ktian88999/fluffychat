@@ -10,11 +10,16 @@ abstract class AppConfig {
 
   static const Color chatColor = primaryColor;
   static const double messageFontSize = 16.0;
-  static const bool allowOtherHomeservers = true;
+  static const bool allowOtherHomeservers = false; // 设为 false，不让用户改服务器
   static const bool enableRegistration = true;
   static const bool hideTypingUsernames = false;
 
-  static const String inviteLinkPrefix = 'https://matrix.to/#/';
+  // 【新增】这就是让 App 强制连接你服务器的核心代码
+  static const String defaultHomeserver = 'https://im.tk00.vip'; 
+  
+  // 顺便修复一下少了个斜杠的问题
+  static const String inviteLinkPrefix = 'https://im.tk00.vip/'; 
+
   static const String deepLinkPrefix = 'im.fluffychat://chat/';
   static const String schemePrefix = 'matrix:';
   static const String pushNotificationsChannelId = 'fluffychat_push';
